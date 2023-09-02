@@ -1,10 +1,12 @@
-﻿using LoginComponent.Helpers;
+﻿using FluentValidation;
+using LoginComponent.Helpers;
 using LoginComponent.Interface.IRepositories;
 using LoginComponent.Interface.IServices;
 using LoginComponent.Models;
 using LoginComponent.Models.Request;
 using LoginComponent.Models.Responses.Auth;
 using LoginComponent.Models.Responses.Token;
+using System.ComponentModel.DataAnnotations;
 
 namespace LoginComponent.Service
 {
@@ -13,14 +15,17 @@ namespace LoginComponent.Service
         private readonly ITokenRepositories _tokenRepositories;
         private readonly ITokenService _tokenService;
         private readonly IUserRepositories _userRepositories;
+        private IValidator<SingUpRequest> _validator;
 
         public UserService(ITokenService tokenService,
             IUserRepositories userRepositories,
-            ITokenRepositories tokenRepositories)
+            ITokenRepositories tokenRepositories,
+            IValidator<SingUpRequest> validator)
         {
             _tokenService = tokenService;
             _userRepositories = userRepositories;
             _tokenRepositories = tokenRepositories;
+            _validator = validator;
         }
 
         public async Task<UserResponse> GetInfoAsync(Guid UserId)
@@ -123,25 +128,37 @@ namespace LoginComponent.Service
                 };
             }
 
-            if (singUpRequest.Password != singUpRequest.ConfirmPassword)
+            var result = await _validator.ValidateAsync(singUpRequest);
+
+            if(!result.IsValid)
             {
+                var error = result.Errors.FirstOrDefault();
                 return new SignUpResponse
-                {
-                    Success = false,
-                    Error = "Password and confirm password do not match",
-                    ErrorCode = "400"
+                { Success = false,
+                    Error = error.ErrorMessage,
+                    ErrorCode = error.ErrorCode
                 };
             }
 
-            if (singUpRequest.Password.Length <= 7) 
-            {
-                return new SignUpResponse
-                {
-                    Success = false,
-                    Error = "Password is weak",
-                    ErrorCode = "400"
-                };
-            }
+            //if (singUpRequest.Password != singUpRequest.ConfirmPassword)
+            //{
+            //    return new SignUpResponse
+            //    {
+            //        Success = false,
+            //        Error = "Password and confirm password do not match",
+            //        ErrorCode = "400"
+            //    };
+            //}
+
+            //if (singUpRequest.Password.Length <= 7) 
+            //{
+            //    return new SignUpResponse
+            //    {
+            //        Success = false,
+            //        Error = "Password is weak",
+            //        ErrorCode = "400"
+            //    };
+            //}
 
             var salt = PasswordHelper.GetSecureSalt();
             var passwordHash = PasswordHelper.HashUsingPbkdf2(singUpRequest.Password, salt);

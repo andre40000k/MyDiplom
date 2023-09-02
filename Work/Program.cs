@@ -1,9 +1,12 @@
+using FluentValidation;
 using LoginComponent.Helpers;
 using LoginComponent.Interface.IRepositories;
 using LoginComponent.Interface.IServices;
 using LoginComponent.LoginDataBase;
+using LoginComponent.Models.Request;
 using LoginComponent.Repositories;
 using LoginComponent.Service;
+using LoginComponent.Validations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -71,6 +74,8 @@ namespace LoginComponent
             builder.Services.AddTransient<ITokenRepositories, TokenRepositories>();
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IUserRepositories, UserRepositories>();
+
+            builder.Services.AddTransient<IValidator<SingUpRequest>, SingUpRequestValidation>();
             //builder.Services.AddTransient<ITaskService, TaskService>();
 
             var app = builder.Build();
