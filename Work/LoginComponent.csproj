@@ -15,9 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interface\IRepositories\" />
     <Folder Include="Models\Responses\Task\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>

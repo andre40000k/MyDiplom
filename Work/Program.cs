@@ -1,6 +1,8 @@
 using LoginComponent.Helpers;
+using LoginComponent.Interface.IRepositories;
 using LoginComponent.Interface.IServices;
 using LoginComponent.LoginDataBase;
+using LoginComponent.Repositories;
 using LoginComponent.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -66,7 +68,9 @@ namespace LoginComponent
             builder.Services.AddAuthorization();
 
             builder.Services.AddTransient<ITokenService, TokenService>();
+            builder.Services.AddTransient<ITokenRepositories, TokenRepositories>();
             builder.Services.AddTransient<IUserService, UserService>();
+            builder.Services.AddTransient<IUserRepositories, UserRepositories>();
             //builder.Services.AddTransient<ITaskService, TaskService>();
 
             var app = builder.Build();

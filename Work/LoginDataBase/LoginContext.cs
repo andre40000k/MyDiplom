@@ -18,11 +18,6 @@ namespace LoginComponent.LoginDataBase
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //base.OnModelCreating(modelBuilder);
-
-            //modelBuilder.Entity<AccountModel>()
-            //    .HasKey(x => x.Id);
-
             modelBuilder.Entity<RefreshToken>(entity =>
             {
 

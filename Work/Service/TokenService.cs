@@ -1,20 +1,19 @@
 ﻿using LoginComponent.Helpers;
+using LoginComponent.Interface.IRepositories;
 using LoginComponent.Interface.IServices;
-using LoginComponent.LoginDataBase;
 using LoginComponent.Models;
 using LoginComponent.Models.Request;
 using LoginComponent.Models.Responses.Token;
-using Microsoft.EntityFrameworkCore;
 
 namespace LoginComponent.Service
 {
     public class TokenService : ITokenService
     {
-        private readonly LoginContext _loginContext;
+        private readonly ITokenRepositories _tokenRepositories;
 
-        public TokenService(LoginContext loginContext)
+        public TokenService(ITokenRepositories tokenRepositories)
         {
-            _loginContext = loginContext;
+            _tokenRepositories = tokenRepositories;
         }
 
         public async Task<Tuple<string, string>> GenerateTokenAsync(Guid userId)
@@ -22,9 +21,9 @@ namespace LoginComponent.Service
             var accessToken = await TokenHelper.GenerateAccessToken(userId);
             var refreshToken = await TokenHelper.GenerateRefreshToken();
 
-            var userRecord = await _loginContext.Users.Include(x => x.RefreshTokens).FirstOrDefaultAsync(user => user.Id == userId);
+            var userRecord = await _tokenRepositories.GetUserAsync(userId);
 
-            if(userRecord == null)
+            if (userRecord == null)
             {
                 return null;
             }
@@ -38,16 +37,21 @@ namespace LoginComponent.Service
                 await RemoveRefreshTokenAsync(userRecord);
             }
 
-            userRecord.RefreshTokens?.Add(new RefreshToken
+            var newRefreshToken = new RefreshToken
             {
-                ExpiryTime= DateTime.Now.AddDays(10),
+                ExpiryTime = DateTime.Now.AddDays(10),
                 Ts = DateTime.Now,
                 UserId = userId,
                 TokenHash = refreshTokenHashed,
                 TokenSalt = Convert.ToBase64String(salt),
-            });
+            };
 
-            await _loginContext.SaveChangesAsync();
+            var saveToken = await _tokenRepositories.AddUserTokenAsync(userRecord, newRefreshToken);
+
+            if (saveToken == 0)
+            {
+                return null;
+            }
 
             var token = new Tuple<string, string>(accessToken, refreshToken);
             return token;
@@ -55,16 +59,14 @@ namespace LoginComponent.Service
 
         public async Task<bool> RemoveRefreshTokenAsync(User user)
         {
-            var userRecord = await _loginContext.Users.Include(x => x.RefreshTokens)
-                .FirstOrDefaultAsync(y => y.Id == user.Id);
+            var userRecord = await _tokenRepositories.GetUserAsync(user.Id);
 
             if (userRecord == null)
                 return false;
 
             if(userRecord.RefreshTokens != null && userRecord.RefreshTokens.Any())
             {
-                var currentRefreshToken = userRecord.RefreshTokens.First();
-                _loginContext.RefreshTokens.Remove(currentRefreshToken);
+                _tokenRepositories.RemoveUserToken(userRecord);
             }
 
             return false;
@@ -72,7 +74,8 @@ namespace LoginComponent.Service
 
         public async Task<ValidateRefreshTokenResponse> ValidateRefreshTokenAsync(RefreshTokenRequest refreshTokenRequest)
         {
-            var refreshToken = await _loginContext.RefreshTokens.FirstOrDefaultAsync(x => x.UserId == refreshTokenRequest.UserId);
+            var refreshToken = await _tokenRepositories.GetTokenAsync(refreshTokenRequest.UserId);
+
             var response = new ValidateRefreshTokenResponse();
 
             if(refreshToken == null)

@@ -7,7 +7,7 @@ namespace LoginComponent.Interface.IServices
     public interface IUserService
     {
         Task<SignUpResponse> SignUpAsync(SingUpRequest singUpRequest);
-        Task<TokenResponse> LoginAsinc(LoginRequest loginRequest);
+        Task<TokenResponse> LoginAsync(LoginRequest loginRequest);
         Task<LogoutResponse> LogoutAsync(Guid userId);
         Task<UserResponse> GetInfoAsync(Guid userId);
 

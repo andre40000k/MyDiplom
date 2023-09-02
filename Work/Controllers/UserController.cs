@@ -32,7 +32,7 @@ namespace LoginComponent.Controllers
                 });
             }
 
-            var loginResponse = await _userService.LoginAsinc(loginRequest);
+            var loginResponse = await _userService.LoginAsync(loginRequest);
 
             if (!loginResponse.Success)
             {
