@@ -1,5 +1,5 @@
 ﻿using LoginComponent.Interface.IRepositories;
-using LoginComponent.LoginDataBase;
+using LoginComponent.DataBase;
 using LoginComponent.Models;
 using LoginComponent.Models.Request;
 using Microsoft.EntityFrameworkCore;
@@ -8,8 +8,8 @@ namespace LoginComponent.Repositories
 {
     public class UserRepositories : IUserRepositories 
     {
-        private readonly LoginContext _loginContext;
-        public UserRepositories(LoginContext loginContext)
+        private readonly AplicationContext _loginContext;
+        public UserRepositories(AplicationContext loginContext)
         {
             _loginContext = loginContext;
         }

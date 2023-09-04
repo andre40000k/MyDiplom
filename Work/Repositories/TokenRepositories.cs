@@ -1,5 +1,5 @@
 ﻿using LoginComponent.Interface.IRepositories;
-using LoginComponent.LoginDataBase;
+using LoginComponent.DataBase;
 using LoginComponent.Models;
 using LoginComponent.Models.Request;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +8,9 @@ namespace LoginComponent.Repositories
 {
     public class TokenRepositories : ITokenRepositories
     {
-        private readonly LoginContext _loginContext;
+        private readonly AplicationContext _loginContext;
 
-        public TokenRepositories(LoginContext loginContext)
+        public TokenRepositories(AplicationContext loginContext)
         {
             _loginContext = loginContext;
         }

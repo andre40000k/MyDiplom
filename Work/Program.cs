@@ -2,7 +2,7 @@ using FluentValidation;
 using LoginComponent.Helpers;
 using LoginComponent.Interface.IRepositories;
 using LoginComponent.Interface.IServices;
-using LoginComponent.LoginDataBase;
+using LoginComponent.DataBase;
 using LoginComponent.Models.Request;
 using LoginComponent.Repositories;
 using LoginComponent.Service;
@@ -21,10 +21,10 @@ namespace LoginComponent
 
             builder
                 .Configuration
-                .AddUserSecrets<LoginContext>()
+                .AddUserSecrets<AplicationContext>()
                 .Build();
 
-            builder.Services.AddDbContext<LoginContext>(options =>
+            builder.Services.AddDbContext<AplicationContext>(options =>
             {
                 var conectionString = builder
                 .Configuration
