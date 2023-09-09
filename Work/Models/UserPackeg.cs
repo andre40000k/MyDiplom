@@ -6,7 +6,7 @@ namespace LoginComponent.Models
     {
         public string Id { get; set; }
         public Guid UserId { get; set; }
-        public Guid TransportId { get; set; }
+        public string TransportId { get; set; }
         public string CurrentLocation { get; set; }
         public string StartLocation { get; set; }
         public string FinalLocation { get; set; }

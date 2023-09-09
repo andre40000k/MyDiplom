@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LoginComponent.Models.Request
+namespace LoginComponent.Models.Request.Auth
 {
     public class SingUpRequest
     {

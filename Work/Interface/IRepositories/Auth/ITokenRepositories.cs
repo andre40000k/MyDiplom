@@ -1,6 +1,6 @@
 ﻿using LoginComponent.Models;
 
-namespace LoginComponent.Interface.IRepositories
+namespace LoginComponent.Interface.IRepositories.Auth
 {
     public interface ITokenRepositories
     {

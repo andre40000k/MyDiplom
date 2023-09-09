@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using LoginComponent.Models.Request;
+using LoginComponent.Models.Request.Auth;
 
 namespace LoginComponent.Validations
 {

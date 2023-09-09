@@ -1,8 +1,8 @@
 ﻿using LoginComponent.Models;
-using LoginComponent.Models.Request;
+using LoginComponent.Models.Request.Token;
 using LoginComponent.Models.Responses.Token;
 
-namespace LoginComponent.Interface.IServices
+namespace LoginComponent.Interface.IServices.Auth
 {
     public interface ITokenService
     {

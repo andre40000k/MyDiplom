@@ -1,15 +1,23 @@
 using FluentValidation;
 using LoginComponent.Helpers;
-using LoginComponent.Interface.IRepositories;
-using LoginComponent.Interface.IServices;
 using LoginComponent.DataBase;
-using LoginComponent.Models.Request;
-using LoginComponent.Repositories;
-using LoginComponent.Service;
 using LoginComponent.Validations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using LoginComponent.Repositories.Auth;
+using LoginComponent.Service.Auth;
+using LoginComponent.Interface.IRepositories.Auth;
+using LoginComponent.Interface.IServices.Auth;
+using LoginComponent.Interface.IServices.Admin;
+using LoginComponent.Service.Admin;
+using LoginComponent.Interface.IRepositories.Admin;
+using LoginComponent.Repositories.Admin;
+using LoginComponent.Interface.IServices.Customer;
+using LoginComponent.Service.Customer;
+using LoginComponent.Interface.IRepositories.Customer;
+using LoginComponent.Repositories.Customer;
+using LoginComponent.Models.Request.Auth;
 
 namespace LoginComponent
 {
@@ -72,8 +80,14 @@ namespace LoginComponent
 
             builder.Services.AddTransient<ITokenService, TokenService>();
             builder.Services.AddTransient<ITokenRepositories, TokenRepositories>();
-            builder.Services.AddTransient<IUserService, UserService>();
-            builder.Services.AddTransient<IUserRepositories, UserRepositories>();
+            builder.Services.AddTransient<IAuthService, AuthService>();
+            builder.Services.AddTransient<IAuthRepositories, AuthRepositories>();
+
+            builder.Services.AddTransient<IAdminService, AdminService>();
+            builder.Services.AddTransient<IAdminRepository, AdminRepository>();
+
+            builder.Services.AddTransient<ICustomerService, CustomerService>();
+            builder.Services.AddTransient<ICustomerRepsitory, CustomerRepository>();
 
             builder.Services.AddTransient<IValidator<SingUpRequest>, SingUpRequestValidation>();
             //builder.Services.AddTransient<ITaskService, TaskService>();

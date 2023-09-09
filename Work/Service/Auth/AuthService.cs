@@ -1,24 +1,23 @@
 ﻿using FluentValidation;
 using LoginComponent.Helpers;
-using LoginComponent.Interface.IRepositories;
-using LoginComponent.Interface.IServices;
+using LoginComponent.Interface.IRepositories.Auth;
+using LoginComponent.Interface.IServices.Auth;
 using LoginComponent.Models;
-using LoginComponent.Models.Request;
+using LoginComponent.Models.Request.Auth;
 using LoginComponent.Models.Responses.Auth;
 using LoginComponent.Models.Responses.Token;
-using System.ComponentModel.DataAnnotations;
 
-namespace LoginComponent.Service
+namespace LoginComponent.Service.Auth
 {
-    public class UserService : IUserService
+    public class AuthService : IAuthService
     {
         private readonly ITokenRepositories _tokenRepositories;
         private readonly ITokenService _tokenService;
-        private readonly IUserRepositories _userRepositories;
+        private readonly IAuthRepositories _userRepositories;
         private IValidator<SingUpRequest> _validator;
 
-        public UserService(ITokenService tokenService,
-            IUserRepositories userRepositories,
+        public AuthService(ITokenService tokenService,
+            IAuthRepositories userRepositories,
             ITokenRepositories tokenRepositories,
             IValidator<SingUpRequest> validator)
         {
@@ -61,15 +60,15 @@ namespace LoginComponent.Service
                 return new TokenResponse
                 {
                     Success = false,
-                    Error= "Email not found",
-                    ErrorCode= "401"
+                    Error = "Email not found",
+                    ErrorCode = "401"
                 };
             }
 
             var passWordHash = PasswordHelper.HashUsingPbkdf2(
                 loginRequest.Password, Convert.FromBase64String(user.PasswordSalt));
 
-            if(user.Password != passWordHash)
+            if (user.Password != passWordHash)
             {
                 return new TokenResponse
                 {
@@ -107,10 +106,11 @@ namespace LoginComponent.Service
                 return new LogoutResponse { Success = true };
             }
 
-            return new LogoutResponse { 
-                Success = false, 
-                Error = "Unable to logout user", 
-                ErrorCode = "401" 
+            return new LogoutResponse
+            {
+                Success = false,
+                Error = "Unable to logout user",
+                ErrorCode = "401"
             };
 
         }
@@ -130,11 +130,12 @@ namespace LoginComponent.Service
 
             var result = await _validator.ValidateAsync(singUpRequest);
 
-            if(!result.IsValid)
+            if (!result.IsValid)
             {
                 var error = result.Errors.FirstOrDefault();
                 return new SignUpResponse
-                { Success = false,
+                {
+                    Success = false,
                     Error = error.ErrorMessage,
                     ErrorCode = error.ErrorCode
                 };
@@ -171,7 +172,7 @@ namespace LoginComponent.Service
                 FirstName = singUpRequest.FirstName,
                 LastName = singUpRequest.LastName,
                 Ts = singUpRequest.Ts,
-                IsEmailConfirmed = true 
+                IsEmailConfirmed = true
             };
 
             var saveResponse = await _userRepositories.SaveDataAsync(user);

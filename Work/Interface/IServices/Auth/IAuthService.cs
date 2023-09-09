@@ -1,10 +1,10 @@
-﻿using LoginComponent.Models.Request;
+﻿using LoginComponent.Models.Request.Auth;
 using LoginComponent.Models.Responses.Auth;
 using LoginComponent.Models.Responses.Token;
 
-namespace LoginComponent.Interface.IServices
+namespace LoginComponent.Interface.IServices.Auth
 {
-    public interface IUserService
+    public interface IAuthService
     {
         Task<SignUpResponse> SignUpAsync(SingUpRequest singUpRequest);
         Task<TokenResponse> LoginAsync(LoginRequest loginRequest);

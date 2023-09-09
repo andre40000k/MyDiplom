@@ -1,5 +1,6 @@
-﻿using LoginComponent.Interface.IServices;
-using LoginComponent.Models.Request;
+﻿using LoginComponent.Interface.IServices.Auth;
+using LoginComponent.Models.Request.Auth;
+using LoginComponent.Models.Request.Token;
 using LoginComponent.Models.Responses.Token;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,12 +9,12 @@ namespace LoginComponent.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : BaseApiController
+    public class AuthController : BaseApiController
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _userService;
         private readonly ITokenService _tokenService;
 
-        public UserController(IUserService userService, ITokenService tokenService)
+        public AuthController(IAuthService userService, ITokenService tokenService)
         {
             _userService = userService;
             _tokenService = tokenService;

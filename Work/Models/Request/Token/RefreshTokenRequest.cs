@@ -1,4 +1,4 @@
-﻿namespace LoginComponent.Models.Request
+﻿namespace LoginComponent.Models.Request.Token
 {
     public class RefreshTokenRequest
     {

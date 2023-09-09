@@ -6,7 +6,7 @@
         { 
             RefreshTokens = new HashSet<RefreshToken>();
             //Tasks = new HashSet<UserTask>();
-            UserPackegs = new HashSet<UserPackeg>();
+            //UserPackegs = new HashSet<UserPackeg>();
         }
 
         public Guid Id { get; set; }
@@ -19,7 +19,7 @@
         public bool IsEmailConfirmed { get; set; }
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
         //public virtual ICollection<UserTask> Tasks { get; set; }
-        public virtual ICollection<UserPackeg> UserPackegs { get; set; }
+        //public virtual ICollection<UserPackeg> UserPackegs { get; set; }
 
     }
 }

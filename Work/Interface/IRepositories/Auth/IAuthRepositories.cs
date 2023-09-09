@@ -1,8 +1,8 @@
 ﻿using LoginComponent.Models;
 
-namespace LoginComponent.Interface.IRepositories
+namespace LoginComponent.Interface.IRepositories.Auth
 {
-    public interface IUserRepositories
+    public interface IAuthRepositories
     {
         Task<User> GetDataAsync(Guid id);
         Task<User> GetDataAsync(string email);

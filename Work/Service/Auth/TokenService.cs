@@ -1,11 +1,11 @@
 ﻿using LoginComponent.Helpers;
-using LoginComponent.Interface.IRepositories;
-using LoginComponent.Interface.IServices;
+using LoginComponent.Interface.IRepositories.Auth;
+using LoginComponent.Interface.IServices.Auth;
 using LoginComponent.Models;
-using LoginComponent.Models.Request;
+using LoginComponent.Models.Request.Token;
 using LoginComponent.Models.Responses.Token;
 
-namespace LoginComponent.Service
+namespace LoginComponent.Service.Auth
 {
     public class TokenService : ITokenService
     {
@@ -32,7 +32,7 @@ namespace LoginComponent.Service
 
             var refreshTokenHashed = PasswordHelper.HashUsingPbkdf2(refreshToken, salt);
 
-            if(userRecord.RefreshTokens != null && userRecord.RefreshTokens.Any())
+            if (userRecord.RefreshTokens != null && userRecord.RefreshTokens.Any())
             {
                 await RemoveRefreshTokenAsync(userRecord);
             }
@@ -64,7 +64,7 @@ namespace LoginComponent.Service
             if (userRecord == null)
                 return false;
 
-            if(userRecord.RefreshTokens != null && userRecord.RefreshTokens.Any())
+            if (userRecord.RefreshTokens != null && userRecord.RefreshTokens.Any())
             {
                 _tokenRepositories.RemoveUserToken(userRecord);
             }
@@ -78,9 +78,9 @@ namespace LoginComponent.Service
 
             var response = new ValidateRefreshTokenResponse();
 
-            if(refreshToken == null)
+            if (refreshToken == null)
             {
-                response.Success= false;
+                response.Success = false;
                 response.Error = "Invalid session or user is already logged out";
                 response.ErrorCode = "401";
                 return response;
@@ -107,7 +107,7 @@ namespace LoginComponent.Service
 
             response.Success = true;
             response.UserId = refreshToken.UserId;
-            return response;    
+            return response;
 
         }
     }

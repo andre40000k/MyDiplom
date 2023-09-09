@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoginComponent.Migrations
 {
     [DbContext(typeof(AplicationContext))]
-    [Migration("20230904204844_AddNewModels")]
-    partial class AddNewModels
+    [Migration("20230908174122_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace LoginComponent.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("LoginComponent.Models.Department", b =>
+            modelBuilder.Entity("LoginComponent.Models.Department.DistrictDepartment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,21 +35,58 @@ namespace LoginComponent.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("RegionalID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RegionalID");
+
+                    b.ToTable("DistrictDepartment", (string)null);
+                });
+
+            modelBuilder.Entity("LoginComponent.Models.Department.LocalDepartment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("DistrictId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DistrictId");
+
+                    b.ToTable("LocalDepartment", (string)null);
+                });
+
+            modelBuilder.Entity("LoginComponent.Models.Department.RegionalDepartment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Number")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("TransportId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("TransportId");
-
-                    b.ToTable("Department", (string)null);
+                    b.ToTable("RegionalDepartment", (string)null);
                 });
 
             modelBuilder.Entity("LoginComponent.Models.RefreshToken", b =>
@@ -89,9 +126,8 @@ namespace LoginComponent.Migrations
 
             modelBuilder.Entity("LoginComponent.Models.Transports.Transport", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
@@ -165,8 +201,9 @@ namespace LoginComponent.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("TransportId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("TransportId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -183,16 +220,26 @@ namespace LoginComponent.Migrations
                     b.ToTable("Packeg", (string)null);
                 });
 
-            modelBuilder.Entity("LoginComponent.Models.Department", b =>
+            modelBuilder.Entity("LoginComponent.Models.Department.DistrictDepartment", b =>
                 {
-                    b.HasOne("LoginComponent.Models.Transports.Transport", "Transport")
-                        .WithMany("Departments")
-                        .HasForeignKey("TransportId")
-                        .OnDelete(DeleteBehavior.ClientNoAction)
+                    b.HasOne("LoginComponent.Models.Department.RegionalDepartment", "RegionalDepartment")
+                        .WithMany("DistrictDepartments")
+                        .HasForeignKey("RegionalID")
                         .IsRequired()
-                        .HasConstraintName("FK_Department_Transport");
+                        .HasConstraintName("FK_DistrictDepartment_RegionalDepartment");
 
-                    b.Navigation("Transport");
+                    b.Navigation("RegionalDepartment");
+                });
+
+            modelBuilder.Entity("LoginComponent.Models.Department.LocalDepartment", b =>
+                {
+                    b.HasOne("LoginComponent.Models.Department.DistrictDepartment", "DistrictDepartment")
+                        .WithMany("LocalDepatments")
+                        .HasForeignKey("DistrictId")
+                        .IsRequired()
+                        .HasConstraintName("FK_DistrictDepartment_LocalDepartment");
+
+                    b.Navigation("DistrictDepartment");
                 });
 
             modelBuilder.Entity("LoginComponent.Models.RefreshToken", b =>
@@ -209,35 +256,35 @@ namespace LoginComponent.Migrations
             modelBuilder.Entity("LoginComponent.Models.UserPackeg", b =>
                 {
                     b.HasOne("LoginComponent.Models.Transports.Transport", "Transport")
-                        .WithMany("UserPackegs")
+                        .WithMany()
                         .HasForeignKey("TransportId")
-                        .OnDelete(DeleteBehavior.ClientNoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_Packeg_Transport");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("LoginComponent.Models.User", "User")
-                        .WithMany("UserPackegs")
+                        .WithMany()
                         .HasForeignKey("UserId")
-                        .IsRequired()
-                        .HasConstraintName("FK_Packeg_User");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Transport");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LoginComponent.Models.Transports.Transport", b =>
+            modelBuilder.Entity("LoginComponent.Models.Department.DistrictDepartment", b =>
                 {
-                    b.Navigation("Departments");
+                    b.Navigation("LocalDepatments");
+                });
 
-                    b.Navigation("UserPackegs");
+            modelBuilder.Entity("LoginComponent.Models.Department.RegionalDepartment", b =>
+                {
+                    b.Navigation("DistrictDepartments");
                 });
 
             modelBuilder.Entity("LoginComponent.Models.User", b =>
                 {
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("UserPackegs");
                 });
 #pragma warning restore 612, 618
         }

@@ -2,17 +2,17 @@
 {
     public class Transport
     {
-        public Transport()
-        {
-            UserPackegs = new HashSet<UserPackeg>();
-            Departments = new HashSet<Department>();
-        }
+        //public Transport()
+        //{
+        //    //UserPackegs = new HashSet<UserPackeg>();
+        //    //Departments = new HashSet<BaseDepartment>();
+        //}
 
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public int Capacity { get; set; }
         public string TypeOfTransport { get; set; }
-        public virtual ICollection<Department> Departments { get; set; }
-        public virtual ICollection<UserPackeg> UserPackegs { get; set; }
+        //public virtual ICollection<BaseDepartment> Departments { get; set; }
+        //public virtual ICollection<UserPackeg> UserPackegs { get; set; }
 
 
     }

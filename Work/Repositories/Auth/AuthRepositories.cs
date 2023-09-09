@@ -1,15 +1,15 @@
-﻿using LoginComponent.Interface.IRepositories;
-using LoginComponent.DataBase;
+﻿using LoginComponent.DataBase;
 using LoginComponent.Models;
 using LoginComponent.Models.Request;
 using Microsoft.EntityFrameworkCore;
+using LoginComponent.Interface.IRepositories.Auth;
 
-namespace LoginComponent.Repositories
+namespace LoginComponent.Repositories.Auth
 {
-    public class UserRepositories : IUserRepositories 
+    public class AuthRepositories : IAuthRepositories
     {
         private readonly AplicationContext _loginContext;
-        public UserRepositories(AplicationContext loginContext)
+        public AuthRepositories(AplicationContext loginContext)
         {
             _loginContext = loginContext;
         }

@@ -1,10 +1,9 @@
-﻿using LoginComponent.Interface.IRepositories;
-using LoginComponent.DataBase;
+﻿using LoginComponent.DataBase;
 using LoginComponent.Models;
-using LoginComponent.Models.Request;
 using Microsoft.EntityFrameworkCore;
+using LoginComponent.Interface.IRepositories.Auth;
 
-namespace LoginComponent.Repositories
+namespace LoginComponent.Repositories.Auth
 {
     public class TokenRepositories : ITokenRepositories
     {

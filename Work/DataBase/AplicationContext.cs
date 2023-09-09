@@ -1,18 +1,26 @@
 ﻿using LoginComponent.Models;
+using LoginComponent.Models.Department;
+//using LoginComponent.Models.BaseDepartment;
 using LoginComponent.Models.Transports;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoginComponent.DataBase
 {
-    public class AplicationContext : DbContext
+    public partial class AplicationContext : DbContext
     {
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<User> Users => Set<User>();
         //public DbSet<UserTask> Tasks => Set<UserTask>();
+
+
         public DbSet<UserPackeg> UserPackegs => Set<UserPackeg>();
         public DbSet<Transport> Transports => Set<Transport>(); 
-        public DbSet<User> Users => Set<User>();
-        public DbSet<Department> Departments => Set<Department>();  
 
+        public DbSet<LocalDepartment> LocalDepartments => Set<LocalDepartment>();
+        public DbSet<DistrictDepartment> DistrictDepartments => Set<DistrictDepartment>();
+        public DbSet<RegionalDepartment> RegionalDepartments => Set<RegionalDepartment>();
+
+        // dotnet ef database update 20230908170300_ChangeV1
         public AplicationContext(DbContextOptions<AplicationContext> options) 
             : base(options) 
         {
@@ -22,6 +30,52 @@ namespace LoginComponent.DataBase
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<LocalDepartment>(entity =>
+            {
+
+                entity.Property(e => e.Number)
+                      .IsRequired();
+
+                entity.Property(e => e.Address)
+                      .IsRequired();
+
+                entity.HasOne(d => d.DistrictDepartment)
+                     .WithMany(p => p.LocalDepatments)
+                     .HasForeignKey(d => d.DistrictId)
+                     .OnDelete(DeleteBehavior.ClientSetNull)
+                     .HasConstraintName("FK_DistrictDepartment_LocalDepartment");
+
+                entity.ToTable("LocalDepartment");
+            });
+
+            modelBuilder.Entity<DistrictDepartment>(entity =>
+            {
+                entity.Property(e => e.Number)
+                      .IsRequired();
+
+                entity.Property(e => e.Address)
+                      .IsRequired();
+
+                entity.HasOne(d => d.RegionalDepartment)
+                      .WithMany(p => p.DistrictDepartments)
+                      .HasForeignKey(d => d.RegionalID)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_DistrictDepartment_RegionalDepartment");
+
+                entity.ToTable("DistrictDepartment");
+            });
+
+            modelBuilder.Entity<RegionalDepartment>(entity =>
+            {
+                entity.Property(e => e.Number)
+                      .IsRequired();
+
+                entity.Property(e => e.Address)
+                      .IsRequired();
+
+                entity.ToTable("RegionalDepartment");
+            });
+
             modelBuilder.Entity<RefreshToken>(entity =>
             {
 
@@ -82,41 +136,22 @@ namespace LoginComponent.DataBase
                 entity.Property(e => e.Weight)
                       .IsRequired();
 
-                entity.HasOne(d => d.User)
-                      .WithMany(p => p.UserPackegs)
-                      .HasForeignKey(d => d.UserId)
-                      .OnDelete(DeleteBehavior.ClientSetNull)
-                      .HasConstraintName("FK_Packeg_User");
+                //entity.HasOne(d => d.User)
+                //      .WithMany(p => p.UserPackegs)
+                //      .HasForeignKey(d => d.UserId)
+                //      .OnDelete(DeleteBehavior.ClientSetNull)
+                //      .HasConstraintName("FK_Packeg_User");
 
-                entity.HasOne(d => d.Transport)
-                      .WithMany(p => p.UserPackegs)
-                      .HasForeignKey(d => d.TransportId)
-                      .OnDelete(DeleteBehavior.ClientNoAction)
-                      .HasConstraintName("FK_Packeg_Transport");
+                //entity.HasOne(d => d.Transport)
+                //      .WithMany(p => p.UserPackegs)
+                //      .HasForeignKey(d => d.TransportId)
+                //      .OnDelete(DeleteBehavior.ClientNoAction)
+                //      .HasConstraintName("FK_Packeg_Transport");
 
                 entity.ToTable("Packeg");
             });
 
-            modelBuilder.Entity<Department>(entity =>
-            {
-                
-                entity.Property(e => e.Number)
-                      .IsRequired();
 
-                entity.Property(e => e.Name)
-                      .IsRequired();
-
-                entity.Property(e => e.Address)
-                      .IsRequired();
-
-                entity.HasOne(d => d.Transport)
-                      .WithMany(p => p.Departments)
-                      .HasForeignKey(d => d.TransportId)
-                      .OnDelete(DeleteBehavior.ClientNoAction)
-                      .HasConstraintName("FK_Department_Transport");
-
-                entity.ToTable("Department");
-            });
 
             modelBuilder.Entity<Transport>(entity =>
             {
@@ -161,6 +196,9 @@ namespace LoginComponent.DataBase
                 entity.ToTable("User");
 
             });
-        }
+
+            
+    }
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

@@ -6,16 +6,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LoginComponent.Migrations
 {
     /// <inheritdoc />
-    public partial class AddNewModels : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Transport",
+                name: "RegionalDepartment",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RegionalDepartment", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transport",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     TypeOfTransport = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -43,22 +56,21 @@ namespace LoginComponent.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Department",
+                name: "DistrictDepartment",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransportId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RegionalID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Number = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Department", x => x.Id);
+                    table.PrimaryKey("PK_DistrictDepartment", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Department_Transport",
-                        column: x => x.TransportId,
-                        principalTable: "Transport",
+                        name: "FK_DistrictDepartment_RegionalDepartment",
+                        column: x => x.RegionalID,
+                        principalTable: "RegionalDepartment",
                         principalColumn: "Id");
                 });
 
@@ -68,7 +80,7 @@ namespace LoginComponent.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransportId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TransportId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CurrentLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FinalLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -78,15 +90,17 @@ namespace LoginComponent.Migrations
                 {
                     table.PrimaryKey("PK_Packeg", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Packeg_Transport",
+                        name: "FK_Packeg_Transport_TransportId",
                         column: x => x.TransportId,
                         principalTable: "Transport",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Packeg_User",
+                        name: "FK_Packeg_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -111,10 +125,34 @@ namespace LoginComponent.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "LocalDepartment",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DistrictId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LocalDepartment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DistrictDepartment_LocalDepartment",
+                        column: x => x.DistrictId,
+                        principalTable: "DistrictDepartment",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_Department_TransportId",
-                table: "Department",
-                column: "TransportId");
+                name: "IX_DistrictDepartment_RegionalID",
+                table: "DistrictDepartment",
+                column: "RegionalID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocalDepartment_DistrictId",
+                table: "LocalDepartment",
+                column: "DistrictId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Packeg_TransportId",
@@ -136,7 +174,7 @@ namespace LoginComponent.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Department");
+                name: "LocalDepartment");
 
             migrationBuilder.DropTable(
                 name: "Packeg");
@@ -145,10 +183,16 @@ namespace LoginComponent.Migrations
                 name: "RefreshToken");
 
             migrationBuilder.DropTable(
+                name: "DistrictDepartment");
+
+            migrationBuilder.DropTable(
                 name: "Transport");
 
             migrationBuilder.DropTable(
                 name: "User");
+
+            migrationBuilder.DropTable(
+                name: "RegionalDepartment");
         }
     }
 }
