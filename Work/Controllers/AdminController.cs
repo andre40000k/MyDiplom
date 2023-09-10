@@ -1,5 +1,6 @@
 ﻿using LoginComponent.Interface.IServices.Admin;
 using LoginComponent.Models.Request.Admin;
+using LoginComponent.Models.Request.Admin.Department;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoginComponent.Controllers
@@ -32,7 +33,7 @@ namespace LoginComponent.Controllers
 
         [HttpPost]
         [Route("addDepartment")]
-        public async Task<IActionResult> AddDepartment(DepartmentReqest departmentReqest)
+        public async Task<IActionResult> AddDepartment(DepartmentAddReqest departmentReqest)
         {
             var addDepartment = await _adminService.AddTDepartmentAsync(departmentReqest);
 
@@ -42,6 +43,34 @@ namespace LoginComponent.Controllers
             }
 
             return Ok("Department added successfully!");
+        }
+
+        [HttpDelete]
+        [Route("deleteDepartment")]
+        public async Task<IActionResult> DeleteDepartment(DepartmentRemoveRequest departmentRemoveRequest)
+        {
+            var addDepartment = await _adminService.RemoveDepartmentAsync(departmentRemoveRequest);
+
+            if (!addDepartment.Success)
+            {
+                return UnprocessableEntity(addDepartment);
+            }
+
+            return Ok("Department deleted successfully!");
+        }
+
+        [HttpPut]
+        [Route("updataDepartment")]
+        public async Task<IActionResult> UpdataDepartment(DepartmentUpdataRequest departmentUpdataRequest)
+        {
+            var updataDepartment = await _adminService.UpdateDepartmentAsync(departmentUpdataRequest);
+            
+            if (!updataDepartment.Success)
+            {
+                return UnprocessableEntity(updataDepartment);
+            }
+
+            return Ok("Department updata successfully!");
         }
     }
 }

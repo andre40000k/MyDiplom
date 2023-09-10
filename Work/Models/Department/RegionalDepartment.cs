@@ -1,4 +1,6 @@
-﻿namespace LoginComponent.Models.Department
+﻿using LoginComponent.Models.ParcelModel;
+
+namespace LoginComponent.Models.Department
 {
     public class RegionalDepartment : IBaseDepartment
     {
@@ -6,5 +8,6 @@
         public int Number { get; set; }
         public string Address { get; set; }
         public ICollection<DistrictDepartment> DistrictDepartments { get; set; }
+        public ICollection<Parcel> UserPackegs { get; set; }
     }
 }

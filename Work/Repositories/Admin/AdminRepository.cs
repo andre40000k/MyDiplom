@@ -21,18 +21,10 @@ namespace LoginComponent.Repositories.Admin
 
         public async Task<int> SaveTransportAsync(Transport transport)
         {
-            //await _aplicationContext.Transports.AddAsync(transport);
+            await _aplicationContext.Transports.AddAsync(transport);
 
             return await _aplicationContext.SaveChangesAsync();
         }
-
-        //public async Task<int> SaveDepartmentAsync(Department department)
-        //{
-        //    await _aplicationContext.Departments.AddAsync(department);
-
-        //    return await _aplicationContext.SaveChangesAsync();
-        //}
-
         public async Task<Transport?> GetTransportsAsync(string Id)
         {
             //return await _aplicationContext.Transports.FirstOrDefaultAsync(t => t.Id == Id);
@@ -40,19 +32,9 @@ namespace LoginComponent.Repositories.Admin
             return null;
         }
 
-        //public async Task<Department?> GetDepartmentAsync(Guid Id)
-        //{
-        //    return await _aplicationContext.Departments.FirstOrDefaultAsync(t => t.Id == Id);
-        //}
 
-        //public async Task<int> SaveDepartmentAsync(RegionalDepartment regionalDepartment)
-        //{
-        //    await _aplicationContext.RegionalDepartments.AddAsync(regionalDepartment);
 
-        //    return await _aplicationContext.SaveChangesAsync();
-        //}
-
-        public async Task<RegionalDepartment?> SearchDepartmentsAddressAsync(string adress, DepartmentImportanceEnum typeDepartment)
+        public async Task<IBaseDepartment?> SearchDepartmentsAddressAsync(string adress, DepartmentImportanceEnum typeDepartment)
         {
             switch(typeDepartment)
             {
@@ -61,24 +43,17 @@ namespace LoginComponent.Repositories.Admin
                         .FirstOrDefaultAsync(a => a.Address == adress);
                
                 case DepartmentImportanceEnum.District:
-                    return await _aplicationContext.RegionalDepartments
-                        .Where(d => d.DistrictDepartments
-                               .Any(a => a.Address == adress))
-                        .FirstOrDefaultAsync();
+                    return await _aplicationContext.DistrictDepartments
+                        .FirstOrDefaultAsync(a => a.Address == adress);
 
                 case DepartmentImportanceEnum.Local:
-                    return await _aplicationContext.RegionalDepartments
-                        .Where(d => d.DistrictDepartments
-                               .Any(l => l.LocalDepatments
-                                    .Any(a => a.Address == adress)))
-                        .FirstOrDefaultAsync();
-
+                    return await _aplicationContext.LocalDepartments
+                        .FirstOrDefaultAsync(a => a.Address == adress);
                 default:
                     return null;
             }
         }
-
-        public async Task<RegionalDepartment?> SearchDepartmentsIdAsync(Guid nodalId, DepartmentImportanceEnum typeDepartment)
+        public async Task<IBaseDepartment?> SearchParentDepartmentsIdAsync(Guid nodalId, DepartmentImportanceEnum typeDepartment)
         {
             switch (typeDepartment)
             {
@@ -89,72 +64,189 @@ namespace LoginComponent.Repositories.Admin
 
                 case DepartmentImportanceEnum.District:
 
-                    return await _aplicationContext.RegionalDepartments
-                        .Include(d => d.DistrictDepartments)
-                        .ThenInclude(l => l.LocalDepatments)
-                        .FirstOrDefaultAsync(d => d.DistrictDepartments
-                        .Any(id =>id.Id == nodalId));
+                    return await _aplicationContext.DistrictDepartments
+                        .Include(d => d.LocalDepatments)
+                        .FirstOrDefaultAsync(id => id.Id == nodalId);
 
                 default:
                     return null;
             }
         }
-        public async Task<int> SearchDepartmentsNumberAsync()
-        {
-            return await _aplicationContext.RegionalDepartments
-                        .MaxAsync(n => n.Number);
-        }
-
         public async Task<int?> SearchDepartmentsNumberAsync(Guid nodalId, DepartmentImportanceEnum typeDepartment)
         {
             switch (typeDepartment)
             {
-                case DepartmentImportanceEnum.District:
-
+                case DepartmentImportanceEnum.Regional:
                     return await _aplicationContext.RegionalDepartments
-                        .Where(id => id.Id == nodalId)
-                        .SelectMany(d => d.DistrictDepartments)
+                        .Select(n => (int?)n.Number)
+                        .DefaultIfEmpty()
+                        .MaxAsync();
+
+                case DepartmentImportanceEnum.District:
+                    return await _aplicationContext.DistrictDepartments
+                        .Where(id => id.RegionalID == nodalId)
                         .Select(n => (int?)n.Number)
                         .DefaultIfEmpty()
                         .MaxAsync();
 
                 case DepartmentImportanceEnum.Local:
-
-                    return await _aplicationContext.RegionalDepartments
-                        .SelectMany(d => d.DistrictDepartments)
-                        .Where(id => id.Id == nodalId)
-                        .SelectMany(l => l.LocalDepatments)
+                    return await _aplicationContext.LocalDepartments
+                        .Where(id => id.DistrictId == nodalId)
                         .Select(n => (int?)n.Number)
                         .DefaultIfEmpty()
                         .MaxAsync();
+
+                default:
+                    return null;
+            }
+
+            //var existingDepartment = await SearchDepartment(nodalId, typeDepartment-1);
+
+            //var type = existingDepartment.GetType();
+
+            //switch (type)
+            //{
+            //    //case var t when t == typeof(RegionalDepartment):
+            //    //    //_aplicationContext.RegionalDepartments.Remove((RegionalDepartment)(object)existingDepartment);
+            //    //    return await _aplicationContext.SaveChangesAsync();
+
+            //    case var t when t == typeof(DistrictDepartment):
+
+            //        return await _aplicationContext.DistrictDepartments
+            //            .Where(id => id.RegionalID == nodalId)
+            //            .Select(n => (int?)n.Number)
+            //            .DefaultIfEmpty()
+            //            .MaxAsync();
+
+            //    //_aplicationContext.DistrictDepartments.Remove((DistrictDepartment)(object)existingDepartment);
+            //    //return await _aplicationContext.SaveChangesAsync();
+
+            //    case var t when t == typeof(LocalDepartment):
+            //        _aplicationContext.LocalDepartments.Remove((LocalDepartment)(object)existingDepartment);
+            //        return await _aplicationContext.SaveChangesAsync();
+
+            //    default:
+            //        return null;
+            //}
+            //switch (typeDepartment)
+            //{
+            //    case DepartmentImportanceEnum.District:
+
+            //        return await _aplicationContext.RegionalDepartments
+            //            .Where(id => id.Id == nodalId)
+            //            .SelectMany(d => d.DistrictDepartments)
+            //            .Select(n => (int?)n.Number)
+            //            .DefaultIfEmpty()
+            //            .MaxAsync();
+
+            //    case DepartmentImportanceEnum.Local:
+
+            //        return await _aplicationContext.RegionalDepartments
+            //            .SelectMany(d => d.DistrictDepartments)
+            //            .Where(id => id.Id == nodalId)
+            //            .SelectMany(l => l.LocalDepatments)
+            //            .Select(n => (int?)n.Number)
+            //            .DefaultIfEmpty()
+            //            .MaxAsync();
+
+            //    default:
+            //        return default;
+            //}
+        }
+        public async Task<IBaseDepartment?> SearchDepartmentAsync(Guid nodalId, DepartmentImportanceEnum typeDepartment)
+        {
+            switch (typeDepartment)
+            {
+                case DepartmentImportanceEnum.Regional:
+                    return await _aplicationContext.RegionalDepartments.FirstOrDefaultAsync(id => id.Id == nodalId);
+
+                case DepartmentImportanceEnum.District:
+                    return await _aplicationContext.DistrictDepartments.FirstOrDefaultAsync(id => id.Id == nodalId);
+
+                case DepartmentImportanceEnum.Local:
+                    return await _aplicationContext.LocalDepartments.FirstOrDefaultAsync(id => id.Id == nodalId);
+
+                default:
+                    return null;
+            }
+        }
+
+
+        public async Task<int> AddDepartmentsAsync<T>(T department, Guid idPerentDepartment)
+            where T : notnull
+        {
+            var type = department.GetType();
+            switch (type)
+            {
+                case var t when t == typeof(RegionalDepartment):
+                    _aplicationContext.RegionalDepartments.Add((RegionalDepartment)(object)department);
+                    return await _aplicationContext.SaveChangesAsync();
+
+                case var t when t == typeof(DistrictDepartment):
+                    _aplicationContext.RegionalDepartments.Include(d => d.DistrictDepartments)
+                        .First(id => id.Id == idPerentDepartment)
+                        .DistrictDepartments.Add((DistrictDepartment)(object)department);
+                    return await _aplicationContext.SaveChangesAsync();
+
+                case var t when t == typeof(LocalDepartment):
+                    _aplicationContext.DistrictDepartments.Include(d => d.LocalDepatments)
+                       .First(id => id.Id == idPerentDepartment)
+                       .LocalDepatments.Add((LocalDepartment)(object)department);
+                    return await _aplicationContext.SaveChangesAsync();
+
+                default:
+                    return default;
+            }
+
+        }
+
+        public async Task<int> UpdateDepartmentAsync<T>(T department) where T : notnull
+        {
+            var type = department.GetType();
+
+            switch (type)
+            {
+                case var t when t == typeof(RegionalDepartment):
+                    _aplicationContext.RegionalDepartments.Update((RegionalDepartment)(object)department);
+                    return await _aplicationContext.SaveChangesAsync();
+
+                case var t when t == typeof(DistrictDepartment):
+                    _aplicationContext.DistrictDepartments.Update((DistrictDepartment)(object)department);
+                    return await _aplicationContext.SaveChangesAsync();
+
+                case var t when t == typeof(LocalDepartment):
+                    _aplicationContext.LocalDepartments.Update((LocalDepartment)(object)department);
+                    return await _aplicationContext.SaveChangesAsync();
 
                 default:
                     return default;
             }
         }
 
-
-
-        public async Task<int> AddDepartmentsAsync(RegionalDepartment regionalDepartment) 
+        public async Task<int?> RemoveDepartmentAsync<T>(T department) 
+            where T : notnull
         {
-            _aplicationContext.RegionalDepartments.Add(regionalDepartment);
-            return await _aplicationContext.SaveChangesAsync();
-        }
+            var type = department.GetType();
 
-        public async Task<int> AddDepartmentsAsync(RegionalDepartment regionalDepartment,
-            DistrictDepartment districtDepartment)
-        {
-            regionalDepartment.DistrictDepartments.Add(districtDepartment);
-            return await _aplicationContext.SaveChangesAsync();
-        }
+            switch (type)
+            {
+                case var t when t == typeof(RegionalDepartment):
+                    _aplicationContext.RegionalDepartments.Remove((RegionalDepartment)(object)department);
+                    return await _aplicationContext.SaveChangesAsync();
 
-        public async Task<int> AddDepartmentsAsync(RegionalDepartment regionalDepartment, 
-            LocalDepartment localDepartment)
-        {
-            regionalDepartment.DistrictDepartments.First()
-                .LocalDepatments.Add(localDepartment);
+                case var t when t == typeof(DistrictDepartment):
+                    _aplicationContext.DistrictDepartments.Remove((DistrictDepartment)(object)department);
+                    return await _aplicationContext.SaveChangesAsync();
 
-            return await _aplicationContext.SaveChangesAsync();
+                case var t when t == typeof(LocalDepartment):
+                    _aplicationContext.LocalDepartments.Remove((LocalDepartment)(object)department);
+                    return await _aplicationContext.SaveChangesAsync();
+
+                default:
+                    return null;
+            }
+
         }
     }
+
 }

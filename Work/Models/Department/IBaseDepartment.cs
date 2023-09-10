@@ -1,4 +1,5 @@
-﻿using LoginComponent.Models.Transports;
+﻿using LoginComponent.Models.ParcelModel;
+using LoginComponent.Models.Transports;
 
 namespace LoginComponent.Models
 {
@@ -7,6 +8,7 @@ namespace LoginComponent.Models
         public Guid Id { get; set; }        
         public int Number { get; set; }
         public string Address { get; set; }
+        public ICollection<Parcel> UserPackegs { get; set; }
 
         //public string? TransportId { get; set; }
         //public string DepartmentImportance { get; set; }

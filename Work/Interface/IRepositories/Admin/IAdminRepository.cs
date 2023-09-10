@@ -1,4 +1,5 @@
 ﻿using LoginComponent.LoginEnums;
+using LoginComponent.Models;
 using LoginComponent.Models.Department;
 using LoginComponent.Models.Transports;
 
@@ -7,23 +8,15 @@ namespace LoginComponent.Interface.IRepositories.Admin
     public interface IAdminRepository
     {
         Task<int> SaveTransportAsync(Transport transport);
-        //Task<int> SaveDepartmentAsync(Department department);
         Task<Transport?> GetTransportsAsync(string Id);
-        //Task<Department?> GetDepartmentAsync(Guid Id);
-        //Task<int> SaveDepartmentAsync(RegionalDepartment regionalDepartment);
-        Task<RegionalDepartment?> SearchDepartmentsAddressAsync(string adress, 
-            DepartmentImportanceEnum typeDepartment);
 
-        Task<int> SearchDepartmentsNumberAsync();
+        Task<IBaseDepartment?> SearchDepartmentsAddressAsync(string adress, DepartmentImportanceEnum typeDepartment);
         Task<int?> SearchDepartmentsNumberAsync(Guid nodalId, DepartmentImportanceEnum typeDepartment);
+        Task<IBaseDepartment?> SearchParentDepartmentsIdAsync(Guid nodalId, DepartmentImportanceEnum typeDepartment);
+        Task<IBaseDepartment?> SearchDepartmentAsync(Guid nodalId, DepartmentImportanceEnum typeDepartment);
 
-
-        Task<RegionalDepartment?> SearchDepartmentsIdAsync(Guid nodalId, 
-            DepartmentImportanceEnum typeDepartment);
-        Task<int> AddDepartmentsAsync(RegionalDepartment regionalDepartment);
-        Task<int> AddDepartmentsAsync(RegionalDepartment regionalDepartment,
-            DistrictDepartment districtDepartment);
-        Task<int> AddDepartmentsAsync(RegionalDepartment regionalDepartment,
-            LocalDepartment localDepartment);
+        Task<int> AddDepartmentsAsync<T>(T department, Guid idPerentDepartment);
+        Task<int> UpdateDepartmentAsync<T>(T department);
+        Task<int?> RemoveDepartmentAsync<T>(T department);
     }
 }

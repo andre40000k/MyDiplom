@@ -1,4 +1,6 @@
-﻿namespace LoginComponent.Models.Transports
+﻿using LoginComponent.Models.ParcelModel;
+
+namespace LoginComponent.Models.Transports
 {
     public class Transport
     {
@@ -8,11 +10,17 @@
         //    //Departments = new HashSet<BaseDepartment>();
         //}
 
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public int Capacity { get; set; }
-        public string TypeOfTransport { get; set; }
+        public string Name { get; set; }
+        public string StartLocation { get; set; }
+        public string CurrentLocation { get; set; }
+        public string EndLocation { get; set; }
+        public ICollection<Parcel> UserPackegs { get; set; }
+
+
         //public virtual ICollection<BaseDepartment> Departments { get; set; }
-        //public virtual ICollection<UserPackeg> UserPackegs { get; set; }
+        //
 
 
     }

@@ -1,20 +1,25 @@
 ﻿using LoginComponent.Models;
 using LoginComponent.Models.Department;
+using LoginComponent.Models.ParcelModel;
 //using LoginComponent.Models.BaseDepartment;
 using LoginComponent.Models.Transports;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoginComponent.DataBase
 {
-    public partial class AplicationContext : DbContext
+    public class AplicationContext : DbContext
     {
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<User> Users => Set<User>();
         //public DbSet<UserTask> Tasks => Set<UserTask>();
 
 
-        public DbSet<UserPackeg> UserPackegs => Set<UserPackeg>();
+        public DbSet<Parcel> Parcels => Set<Parcel>();
+        public DbSet<Location> Locations => Set<Location>();
         public DbSet<Transport> Transports => Set<Transport>(); 
+
+
+
 
         public DbSet<LocalDepartment> LocalDepartments => Set<LocalDepartment>();
         public DbSet<DistrictDepartment> DistrictDepartments => Set<DistrictDepartment>();
@@ -122,11 +127,8 @@ namespace LoginComponent.DataBase
             //    entity.ToTable("Task");
             //});
 
-            modelBuilder.Entity<UserPackeg>(entity =>
+            modelBuilder.Entity<Parcel>(entity =>
             {
-                entity.Property(e => e.CurrentLocation)
-                      .IsRequired();
-
                 entity.Property(e => e.StartLocation)
                       .IsRequired();
 
@@ -135,6 +137,11 @@ namespace LoginComponent.DataBase
 
                 entity.Property(e => e.Weight)
                       .IsRequired();
+
+                entity.HasOne(p => p.User)
+                      .WithMany(u => u.SentParcels)
+                      .HasForeignKey(p => p.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 //entity.HasOne(d => d.User)
                 //      .WithMany(p => p.UserPackegs)
@@ -148,7 +155,17 @@ namespace LoginComponent.DataBase
                 //      .OnDelete(DeleteBehavior.ClientNoAction)
                 //      .HasConstraintName("FK_Packeg_Transport");
 
-                entity.ToTable("Packeg");
+                entity.ToTable("Parcel");
+            });
+
+            modelBuilder.Entity<Location>(entity =>
+            {
+                entity.HasOne(p => p.Parcel)
+                .WithMany(l => l.CurrentLocation)
+                .HasForeignKey(p => p.ParcelId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.ToTable("Location");
             });
 
 
@@ -158,10 +175,7 @@ namespace LoginComponent.DataBase
                 entity.Property(e => e.Capacity)
                       .IsRequired();
 
-                entity.Property(e => e.Capacity)
-                      .IsRequired();
-
-                entity.Property(e => e.TypeOfTransport)
+                entity.Property(e => e.Name)
                       .IsRequired();
 
                 entity.ToTable("Transport");
@@ -198,7 +212,6 @@ namespace LoginComponent.DataBase
             });
 
             
-    }
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+        }
     }
 }

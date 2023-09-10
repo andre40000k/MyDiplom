@@ -1,4 +1,6 @@
-﻿namespace LoginComponent.Models.Department
+﻿using LoginComponent.Models.ParcelModel;
+
+namespace LoginComponent.Models.Department
 {
     public class DistrictDepartment : IBaseDepartment
     {
@@ -8,5 +10,6 @@
         public Guid RegionalID { get; set; }
         public RegionalDepartment RegionalDepartment { get; set; }
         public ICollection<LocalDepartment> LocalDepatments { get; set; }
+        public ICollection<Parcel> UserPackegs { get; set; }
     }
 }

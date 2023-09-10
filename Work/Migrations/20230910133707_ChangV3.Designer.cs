@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoginComponent.Migrations
 {
     [DbContext(typeof(AplicationContext))]
-    [Migration("20230908174122_Initial")]
-    partial class Initial
+    [Migration("20230910133707_ChangV3")]
+    partial class ChangV3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,6 +89,79 @@ namespace LoginComponent.Migrations
                     b.ToTable("RegionalDepartment", (string)null);
                 });
 
+            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Location", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DepartmentAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("DepartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ParcelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ParcelId1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParcelId1");
+
+                    b.ToTable("Location");
+                });
+
+            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Parcel", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("DistrictDepartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FinalLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("LocalDepartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RegionalDepartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("StartLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("TransportId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DistrictDepartmentId");
+
+                    b.HasIndex("LocalDepartmentId");
+
+                    b.HasIndex("RegionalDepartmentId");
+
+                    b.HasIndex("TransportId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Packeg", (string)null);
+                });
+
             modelBuilder.Entity("LoginComponent.Models.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -126,13 +199,26 @@ namespace LoginComponent.Migrations
 
             modelBuilder.Entity("LoginComponent.Models.Transports.Transport", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
-                    b.Property<string>("TypeOfTransport")
+                    b.Property<string>("CurrentLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StartLocation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -184,42 +270,6 @@ namespace LoginComponent.Migrations
                     b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("LoginComponent.Models.UserPackeg", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CurrentLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FinalLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StartLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TransportId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Weight")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TransportId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Packeg", (string)null);
-                });
-
             modelBuilder.Entity("LoginComponent.Models.Department.DistrictDepartment", b =>
                 {
                     b.HasOne("LoginComponent.Models.Department.RegionalDepartment", "RegionalDepartment")
@@ -242,6 +292,44 @@ namespace LoginComponent.Migrations
                     b.Navigation("DistrictDepartment");
                 });
 
+            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Location", b =>
+                {
+                    b.HasOne("LoginComponent.Models.ParcelModel.Parcel", "Parcel")
+                        .WithMany("CurrentLocation")
+                        .HasForeignKey("ParcelId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Parcel");
+                });
+
+            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Parcel", b =>
+                {
+                    b.HasOne("LoginComponent.Models.Department.DistrictDepartment", null)
+                        .WithMany("UserPackegs")
+                        .HasForeignKey("DistrictDepartmentId");
+
+                    b.HasOne("LoginComponent.Models.Department.LocalDepartment", null)
+                        .WithMany("UserPackegs")
+                        .HasForeignKey("LocalDepartmentId");
+
+                    b.HasOne("LoginComponent.Models.Department.RegionalDepartment", null)
+                        .WithMany("UserPackegs")
+                        .HasForeignKey("RegionalDepartmentId");
+
+                    b.HasOne("LoginComponent.Models.Transports.Transport", null)
+                        .WithMany("UserPackegs")
+                        .HasForeignKey("TransportId");
+
+                    b.HasOne("LoginComponent.Models.User", "User")
+                        .WithMany("SentParcels")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LoginComponent.Models.RefreshToken", b =>
                 {
                     b.HasOne("LoginComponent.Models.User", "User")
@@ -253,38 +341,40 @@ namespace LoginComponent.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LoginComponent.Models.UserPackeg", b =>
-                {
-                    b.HasOne("LoginComponent.Models.Transports.Transport", "Transport")
-                        .WithMany()
-                        .HasForeignKey("TransportId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LoginComponent.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Transport");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("LoginComponent.Models.Department.DistrictDepartment", b =>
                 {
                     b.Navigation("LocalDepatments");
+
+                    b.Navigation("UserPackegs");
+                });
+
+            modelBuilder.Entity("LoginComponent.Models.Department.LocalDepartment", b =>
+                {
+                    b.Navigation("UserPackegs");
                 });
 
             modelBuilder.Entity("LoginComponent.Models.Department.RegionalDepartment", b =>
                 {
                     b.Navigation("DistrictDepartments");
+
+                    b.Navigation("UserPackegs");
+                });
+
+            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Parcel", b =>
+                {
+                    b.Navigation("CurrentLocation");
+                });
+
+            modelBuilder.Entity("LoginComponent.Models.Transports.Transport", b =>
+                {
+                    b.Navigation("UserPackegs");
                 });
 
             modelBuilder.Entity("LoginComponent.Models.User", b =>
                 {
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("SentParcels");
                 });
 #pragma warning restore 612, 618
         }

@@ -4,6 +4,7 @@ using LoginComponent.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoginComponent.Migrations
 {
     [DbContext(typeof(AplicationContext))]
-    partial class AplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20230909223234_ChangV2")]
+    partial class ChangV2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,34 +89,14 @@ namespace LoginComponent.Migrations
                     b.ToTable("RegionalDepartment", (string)null);
                 });
 
-            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Location", b =>
+            modelBuilder.Entity("LoginComponent.Models.Parcel", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("DepartmentAddress")
+                    b.Property<string>("CurrentLocation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ParcelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParcelId");
-
-                    b.ToTable("Location", (string)null);
-                });
-
-            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Parcel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("DistrictDepartmentId")
                         .HasColumnType("uniqueidentifier");
@@ -153,7 +136,7 @@ namespace LoginComponent.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Parcel", (string)null);
+                    b.ToTable("Packeg", (string)null);
                 });
 
             modelBuilder.Entity("LoginComponent.Models.RefreshToken", b =>
@@ -286,18 +269,7 @@ namespace LoginComponent.Migrations
                     b.Navigation("DistrictDepartment");
                 });
 
-            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Location", b =>
-                {
-                    b.HasOne("LoginComponent.Models.ParcelModel.Parcel", "Parcel")
-                        .WithMany("CurrentLocation")
-                        .HasForeignKey("ParcelId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Parcel");
-                });
-
-            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Parcel", b =>
+            modelBuilder.Entity("LoginComponent.Models.Parcel", b =>
                 {
                     b.HasOne("LoginComponent.Models.Department.DistrictDepartment", null)
                         .WithMany("UserPackegs")
@@ -352,11 +324,6 @@ namespace LoginComponent.Migrations
                     b.Navigation("DistrictDepartments");
 
                     b.Navigation("UserPackegs");
-                });
-
-            modelBuilder.Entity("LoginComponent.Models.ParcelModel.Parcel", b =>
-                {
-                    b.Navigation("CurrentLocation");
                 });
 
             modelBuilder.Entity("LoginComponent.Models.Transports.Transport", b =>
